@@ -52,6 +52,7 @@ int main()
     }
 
     shmdt(numbers);
+	shmctl(memId, 0, IPC_RMID);
 
     return 0;
 }
