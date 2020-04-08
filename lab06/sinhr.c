@@ -28,7 +28,7 @@ void lockSem(int semId, int n)
 
 int getSem(int semId, int n)
 {
-	return semctl(semId, 0, GETVAL, n);
+	return semctl(semId, n, GETVAL, 0);
 }
 
 int get_random_number(int min, int max)
@@ -36,7 +36,7 @@ int get_random_number(int min, int max)
 	return rand() % (max - min + 1) + min;
 }
 
-void qs(int semId, int *s_arr, int first, int last)
+/*void qs(int semId, int *s_arr, int first, int last)
 {
     if (first < last)
     {
@@ -78,6 +78,36 @@ void qs(int semId, int *s_arr, int first, int last)
         qs(semId, s_arr, first, right);
         qs(semId, s_arr, left, last);
     }
+}*/
+
+void sort(int semId, int* mem, const size_t n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        int minInd = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            lockSem(semId, minInd);
+            lockSem(semId, j);
+			int to_unlock = minInd;
+            if (mem[j] < mem[minInd])
+            {
+                minInd = j;
+            }
+            unlockSem(semId, j);
+            unlockSem(semId, to_unlock);
+        }
+        if (i != minInd)
+        {
+            lockSem(semId, i);
+            int t = mem[i];
+			lockSem(semId, minInd);
+            mem[i] = mem[minInd];
+			unlockSem(semId, i);
+            mem[minInd] = t;
+            unlockSem(semId, minInd);
+        }
+    }
 }
 
 int main(int argv, char *argc[])
@@ -102,6 +132,12 @@ int main(int argv, char *argc[])
 	
 	for (int i=0; i<n; i++)
 		unlockSem(semId, i);
+	
+	/*printf("%d \n",getSem(semId, 1)); 
+	lockSem(semId, 1);
+	printf("%d \n",getSem(semId, 1)); 
+	unlockSem(semId, 1);
+	printf("%d \n",getSem(semId, 1)); */
 	
 	int child_id = fork();
 	
@@ -136,12 +172,13 @@ int main(int argv, char *argc[])
         printf("Sort finished \r\n");
         for (int j=0; j<n; j++)
 			printf("%d ", mem[j]);
-
+		printf("\r\n");
         shmctl(memId, 0, IPC_RMID);
         semctl(semId, 0, IPC_RMID);
 	}
 	else
 	{
-		qs(semId, mem, 0, n-1);
+		//qs(semId, mem, 0, n-1);
+		sort(semId, mem, n);
 	}
 }
