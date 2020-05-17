@@ -9,9 +9,9 @@ int get_random_number(int min, int max)
     return rand() % (max - min + 1) + min;
 }
 
-int comp(int a, int b)
+int comp(const int *a, const int *b)
 {
-    return a > b;
+	return *a - *b;
 }
 
 void swap(int *a, int *b)
@@ -49,7 +49,7 @@ void parentMainCode(int msgId)
     srand(time(NULL));
     for (int i = 0; i < 4; i++)
         localmsg.data[i] = get_random_number(0, 10000);
-    printf("Parent: generate %i %i %i %i", localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
+    printf("Parent: generate %i %i %i %i\n", localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
     localmsg.islast = 1;
     localmsg.mtype = 1;
     msgsnd(msgId, &localmsg, sizeof(localmsg), 0);
@@ -58,7 +58,7 @@ void parentMainCode(int msgId)
     {
         msgrcv(msgId, &localmsg, sizeof(localmsg), 2, 0);
         count_of_r = count_of_r + 1;
-        printf("Parent: get %i: %i %i %i %i", count_of_r, localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
+        printf("Parent: get %i: %i %i %i %i\n", count_of_r, localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
     } while (!localmsg.islast);
     printf("Parent: wait until child is finished.\n");
     waitpid(0, 0, 0);
