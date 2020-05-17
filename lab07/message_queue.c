@@ -11,7 +11,7 @@ int get_random_number(int min, int max)
 
 int comp(const int *a, const int *b)
 {
-	return *a - *b;
+	return *a > *b;
 }
 
 void swap(int *a, int *b)
@@ -28,11 +28,11 @@ int next(int perm[], int n)
     if (i == -1)
         return 0;
     for (int j = i + 1, k = n - 1; j < k; j++, k--)
-        swap(perm[j], perm[k]);
+        swap(perm + j, perm + k);
     int j = i + 1;
     while (perm[j] < perm[i])
         j++;
-    swap(perm[i], perm[j]);
+    swap(perm + i, perm + j);
     return 1;
 }
 
@@ -57,7 +57,9 @@ void parentMainCode(int msgId)
     do
     {
         msgrcv(msgId, &localmsg, sizeof(localmsg), 2, 0);
-        count_of_r = count_of_r + 1;
+        if (localmsg.islast)
+            break;
+        count_of_r++;
         printf("Parent: get %i: %i %i %i %i\n", count_of_r, localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
     } while (!localmsg.islast);
     printf("Parent: wait until child is finished.\n");
@@ -78,7 +80,7 @@ void childMainCode(int msgId)
     msgsnd(msgId, &childlocalmsg, sizeof(childlocalmsg), 0);
     do
     {
-        childlocalmsg.islast = next(childlocalmsg.data, 4);
+        childlocalmsg.islast = !next(childlocalmsg.data, 4);
         childlocalmsg.mtype = 2;
         msgsnd(msgId, &childlocalmsg, sizeof(childlocalmsg), 0);
     } while (!childlocalmsg.islast);
