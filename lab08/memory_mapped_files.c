@@ -4,46 +4,53 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-int main()
-{
-    const char *mapname = "datafile.dat";
 
-    int fmapd = open(mapname, O_RDWR | O_CREAT, 0600);
-    if (fmapd < 0)
+int main(int argv, char *argc[])
+{
+    if (argv != 3)
+    {
+        perror("You should enter name of input and output file\n");
+        return -1;
+    }
+
+    #define input_file_name argc[1]
+    #define output_file_name argc[2]
+
+    int input_file = open(input_file_name, O_RDONLY, 0600);
+    int output_file = open(output_file_name, O_RDWR | O_CREAT, 0600);
+
+    if (input_file < 0)
+    {
+        perror("error with open of input file");
+        return -1;
+    }
+
+    if (output_file < 0)
     {
         perror("error with open of map file");
         return -1;
     }
 
-    int maxdatalength = 1024;
+    struct stat st;
+    stat(input_file_name, &st);
+    #define file_size st.st_size
+    ftruncate(output_file, file_size);
 
-    ftruncate(fmapd, maxdatalength);
-
-    char *data = (char *)mmap(NULL, maxdatalength, PROT_WRITE | PROT_READ, MAP_SHARED, fmapd, 0);
+    char *data = (char *)mmap(NULL, file_size, PROT_WRITE | PROT_READ, MAP_SHARED, output_file, 0);
     if (MAP_FAILED == data)
     {
         perror("error with mmap");
         return -2;
     }
 
-    printf("pointer value = %p\n", data);
+    read(input_file, data, file_size);
 
-    sprintf(data, "hello world!");
-
-    for (int i = 0; i < 10; ++i)
-    {
-        data[20 + i] = 'a';
-    }
-
-    data[50] = 55;
-    data[52] = 'z';
-    data[54] = 33;
-
-    int res = munmap(data, maxdatalength);
-    if (0 != res)
+    if (0 != munmap(data, file_size))
     {
         perror("error with unmapping");
         return -3;
     }
+    close(input_file);
+    close(output_file);
     return 0;
 }
