@@ -13,8 +13,8 @@ int main(int argv, char *argc[])
         return -1;
     }
 
-    #define input_file_name argc[1]
-    #define output_file_name argc[2]
+#define input_file_name argc[1]
+#define output_file_name argc[2]
 
     int input_file = open(input_file_name, O_RDONLY, 0600);
     int output_file = open(output_file_name, O_RDWR | O_CREAT, 0600);
@@ -33,7 +33,7 @@ int main(int argv, char *argc[])
 
     struct stat st;
     stat(input_file_name, &st);
-    #define file_size st.st_size
+#define file_size st.st_size
     ftruncate(output_file, file_size);
 
     char *data = (char *)mmap(NULL, file_size, PROT_WRITE | PROT_READ, MAP_SHARED, output_file, 0);
