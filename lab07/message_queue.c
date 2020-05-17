@@ -78,6 +78,7 @@ void childMainCode(int msgId)
     do
     {
         childlocalmsg.islast = next(childlocalmsg.data, 4);
+        childlocalmsg.mtype = 2;
         msgsnd(msgId, &childlocalmsg, sizeof(childlocalmsg), 0);
     } while (!childlocalmsg.islast);
     printf("Child: the last message was send.\n");
