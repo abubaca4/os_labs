@@ -11,7 +11,7 @@ int get_random_number(int min, int max)
 
 int comp(const int *a, const int *b)
 {
-	return *a > *b;
+    return *a > *b;
 }
 
 void swap(int *a, int *b)
@@ -24,7 +24,8 @@ void swap(int *a, int *b)
 int next(int perm[], int n)
 {
     int i = n - 1;
-    while (--i >= 0 && perm[i] > perm[i + 1]);
+    while (--i >= 0 && perm[i] > perm[i + 1])
+        ;
     if (i == -1)
         return 0;
     for (int j = i + 1, k = n - 1; j < k; j++, k--)

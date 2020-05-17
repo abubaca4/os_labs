@@ -7,7 +7,7 @@
 
 int comp(const int *a, const int *b)
 {
-	return *a - *b;
+    return *a - *b;
 }
 
 void sortAndPrint(int *mem)
@@ -52,7 +52,7 @@ int main()
     }
 
     shmdt(numbers);
-	shmctl(memId, 0, IPC_RMID);
+    shmctl(memId, 0, IPC_RMID);
 
     return 0;
 }

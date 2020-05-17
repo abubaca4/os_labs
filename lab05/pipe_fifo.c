@@ -9,7 +9,7 @@ const char *FIFO_NAME = "test1";
 
 int comp(const int *a, const int *b)
 {
-	return *a - *b;
+    return *a - *b;
 }
 
 int *get_random_nums(int n)
@@ -54,7 +54,7 @@ int main(int argv, char *argc[])
         qsort(received_nums, n, sizeof(int), comp);
         write(p[1], received_nums, sizeof(int) * n);
         close(p[1]);
-		free(received_nums);
+        free(received_nums);
     }
     else
     {
@@ -67,7 +67,7 @@ int main(int argv, char *argc[])
         print_nums(sorted_nums, n);
         close(p[0]);
         unlink(FIFO_NAME);
-		free(sorted_nums);
+        free(sorted_nums);
     }
-	free(nums);
+    free(nums);
 }
