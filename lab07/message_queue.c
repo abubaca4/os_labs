@@ -19,16 +19,16 @@ void parentMainCode(int msgId)
 {
     struct Strmsg localmsg;
     for (int i = 0; i < 4; i++)
-        local_msg.data[i] = get_random_number(0, 10000);
+        localmsg.data[i] = get_random_number(0, 10000);
     localmsg.islast = 1;
     localmsg.mtype = 1;
-    msgsnd(msgId, localmsg, sizeof(localmsg), 0);
+    msgsnd(msgId, &localmsg, sizeof(localmsg), 0);
     int count_of_r = 0;
     do
     {
-        msgrcv(msgId, localmsg, sizeof(localmsg), 2, 0);
+        msgrcv(msgId, &localmsg, sizeof(localmsg), 2, 0);
         count_of_r = count_of_r + 1;
-        printf("Parent get %i: %i %i %i %i", count_of_r, local_msg.data[0], local_msg.data[1], local_msg.data[2], local_msg.data[3]);
+        printf("Parent get %i: %i %i %i %i", count_of_r, localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
     } while (!localmsg.islast);
     printf("Parent: wait until child is finished.\n");
     waitpid(0, 0, 0);
@@ -40,7 +40,7 @@ void parentMainCode(int msgId)
 void childMainCode(int msgId)
 {
     struct Strmsg childlocalmsg;
-    msgrcv(msgId, childlocalmsg, sizeof(childlocalmsg), 1, 0);
+    msgrcv(msgId, &childlocalmsg, sizeof(childlocalmsg), 1, 0);
     int data[4];
     for (int i = 0; i < 3; i++)
         data[i] = childlocalmsg.data[i];
