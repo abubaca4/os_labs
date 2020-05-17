@@ -8,7 +8,7 @@ int main(int argv, char *argc[])
         return -1;
     }
 
-    #define input_file_name argc[1]
+#define input_file_name argc[1]
     int byte_count = atoi(argc[2]);
 
     FILE *fin = fopen(input_file_name, "r");
@@ -17,9 +17,9 @@ int main(int argv, char *argc[])
         perror("cannot open file");
         return -1;
     }
-    
-    printf("read result = ");    
-    for (int i=0; i<byte_count; i++)
+
+    printf("read result = ");
+    for (int i = 0; i < byte_count; i++)
     {
         char data;
         fread(&data, sizeof(char), 1, fin);
