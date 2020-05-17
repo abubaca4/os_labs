@@ -46,6 +46,7 @@ struct Strmsg
 void parentMainCode(int msgId)
 {
     struct Strmsg localmsg;
+    srand(time(NULL));
     for (int i = 0; i < 4; i++)
         localmsg.data[i] = get_random_number(0, 10000);
     printf("Parent: generate %i %i %i %i", localmsg.data[0], localmsg.data[1], localmsg.data[2], localmsg.data[3]);
