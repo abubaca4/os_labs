@@ -22,6 +22,8 @@ unsigned long long mic_s_time()
   return mt;
 }
   
+#define MAX_SAVE_UDP_DATA_SIZE 508
+
 // Driver code 
 int main(int argv, char *argc[]) 
 { 
@@ -71,7 +73,7 @@ int main(int argv, char *argc[])
     servaddr.sin_port = htons(port); 
     inet_aton(ip, &(servaddr.sin_addr));
       
-    int n, len; 
+    int len; 
     unsigned long long t;
 
     sendto(sockfd, (int *)&MAS_SIZE, sizeof(MAS_SIZE), 
@@ -94,16 +96,46 @@ int main(int argv, char *argc[])
     srand(time(NULL));
     for (int i=0; i<MAS_SIZE; i++)
         buffer[i] = get_random_number(MIN_R, MAX_R);
-      
-    sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE, 
-        0, (const struct sockaddr *) &servaddr,  
-            sizeof(servaddr)); 
-    t = mic_s_time();
-          
-    n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
-                0, (struct sockaddr *) &servaddr, 
-                &len); 
-    t = mic_s_time() - t;
+    
+    if (MAS_SIZE * sizeof(int) <= MAX_SAVE_UDP_DATA_SIZE) 
+    {
+        sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE, 
+            0, (const struct sockaddr *) &servaddr,  
+                sizeof(servaddr)); 
+        t = mic_s_time();
+                
+        recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
+                    0, (struct sockaddr *) &servaddr, 
+                    &len); 
+        t = mic_s_time() - t;
+    }
+    else
+    {
+        int data_tr_len = MAX_SAVE_UDP_DATA_SIZE - sizeof(int);
+        for (int i=0; i< (MAS_SIZE * sizeof(int))/data_tr_len + 1; i++)
+        {
+            int packet_size = 1 + (i == MAS_SIZE * sizeof(int) / data_tr_len) ? (MAS_SIZE % (data_tr_len / sizeof(int))) : (data_tr_len / sizeof(int));
+            packet_size = packet_size * sizeof(int);
+            //Буфер и номер отправленного куска
+
+            sendto(sockfd, (int *)(buffer + data_tr_len / sizeof(int)), packet_size, 
+            0, (const struct sockaddr *) &servaddr,  
+                sizeof(servaddr));
+        }
+        t = mic_s_time();
+
+        for (int i=0; i< (MAS_SIZE * sizeof(int))/data_tr_len + 1; i++)
+        {
+            int packet_size = 1 + (i == MAS_SIZE * sizeof(int) / data_tr_len) ? (MAS_SIZE % (data_tr_len / sizeof(int))) : (data_tr_len / sizeof(int));
+            packet_size = packet_size * sizeof(int);
+
+            recvfrom(sockfd, (int *)(buffer + data_tr_len / sizeof(int)), packet_size,  
+                    0, (struct sockaddr *) &servaddr, 
+                    &len);
+            t = mic_s_time() - t; 
+        }
+    }
+    
     printf("Server : "); 
     for (int i=0; i<MAS_SIZE; i++)
         printf("%d ", buffer[i]);

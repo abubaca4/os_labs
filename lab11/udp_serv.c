@@ -13,6 +13,8 @@ static int comp(const void *a, const void *b)
     return *(const int *)a - *(const int *)b;
 }
   
+#define MAX_SAVE_UDP_DATA_SIZE 508
+
 // Driver code 
 int main(int argv, char *argc[]) { 
     int MAS_SIZE;
