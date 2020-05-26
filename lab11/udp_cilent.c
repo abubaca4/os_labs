@@ -41,12 +41,12 @@ int main(int argv, char *argc[])
     }
 
     //Set of for make
-    /*printf("Enter count of elements: ");
-    scanf("%d", MAS_SIZE);
+    printf("Enter count of elements: ");
+    scanf("%d", &MAS_SIZE);
     printf("Enter minimum value: ");
-    scanf("%d", MIN_R);
-    printf("maximum value: ");
-    scanf("%d", MIN_R);*/
+    scanf("%d", &MIN_R);
+    printf("Enter maximum value: ");
+    scanf("%d", &MAX_R);
 
     char ip[border + 1];
     strncpy(ip, argc[1], border);
