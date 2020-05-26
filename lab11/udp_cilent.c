@@ -3,6 +3,7 @@
 #include <unistd.h> 
 #include <string.h> 
 #include <sys/types.h> 
+#include <sys/time.h>
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
@@ -15,6 +16,14 @@ int get_random_number(int min, int max)
 {
     return rand() % (max - min + 1) + min;
 }
+
+long mtime()
+{
+  struct timeval t;
+  gettimeofday(&t, NULL);
+  long mt = (long)t.tv_sec * 1000 + t.tv_usec / 1000;
+  return mt;
+}
   
 // Driver code 
 int main(int argv, char *argc[]) { 
@@ -25,7 +34,6 @@ int main(int argv, char *argc[]) {
     }
 
     int border = strstr(argc[1], ":") - argc[1];
-    printf("%d\n", border);
 
     if (border + argc[1] == NULL)
     {
@@ -36,9 +44,7 @@ int main(int argv, char *argc[]) {
     char ip[border + 1];
     strncpy(ip, argc[1], border);
     ip[border] = '\0';
-    printf("%s\n", ip);
     int port = atoi(argc[1] + border + 1);
-    printf("%d\n", port);
 
     int sockfd; 
     int buffer[MAS_SIZE];  
@@ -58,6 +64,7 @@ int main(int argv, char *argc[]) {
     inet_aton(ip, &servaddr.sin_addr.s_addr);
       
     int n, len; 
+    long t;
     srand(time(NULL));
     for (int i=0; i<MAS_SIZE; i++)
         buffer[i] = get_random_number(MIN_R, MAX_R);
@@ -65,11 +72,17 @@ int main(int argv, char *argc[]) {
     sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE, 
         MSG_CONFIRM, (const struct sockaddr *) &servaddr,  
             sizeof(servaddr)); 
+    t = mtime();
           
     n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
                 MSG_WAITALL, (struct sockaddr *) &servaddr, 
                 &len); 
-    printf("Server : %s\n", buffer); 
+    t = mtime() - t;
+    printf("Server : "); 
+    for (int i=0; i<MAS_SIZE; i++)
+        printf("%d ", buffer[i]);
+    printf("\n");   
+    printf ("It took %ld milliseconds.\n",t);
   
     close(sockfd); 
     return 0; 
