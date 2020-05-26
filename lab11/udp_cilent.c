@@ -108,7 +108,7 @@ int main(int argv, char *argc[])
     for (int i=0; i<MAS_SIZE; i++)
         printf("%d ", buffer[i]);
     printf("\n");   
-    printf ("It took %ld microseconds.\n",t);
+    printf ("It took %lld microseconds.\n",t);
   
     close(sockfd); 
     free(buffer);
