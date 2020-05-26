@@ -14,11 +14,11 @@ int get_random_number(int min, int max)
     return rand() % (max - min + 1) + min;
 }
 
-long ms_time()
+unsigned long long mic_s_time()
 {
   struct timeval t;
   gettimeofday(&t, NULL);
-  long mt = (long)t.tv_sec * 1000 + t.tv_usec / 1000;
+  unsigned long long mt = (unsigned long long)t.tv_sec * 1000000 + t.tv_usec;
   return mt;
 }
   
@@ -72,7 +72,7 @@ int main(int argv, char *argc[])
     inet_aton(ip, &(servaddr.sin_addr));
       
     int n, len; 
-    long t;
+    unsigned long long t;
 
     sendto(sockfd, (int *)&MAS_SIZE, sizeof(MAS_SIZE), 
         0, (const struct sockaddr *) &servaddr,  
@@ -98,17 +98,17 @@ int main(int argv, char *argc[])
     sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE, 
         0, (const struct sockaddr *) &servaddr,  
             sizeof(servaddr)); 
-    t = ms_time();
+    t = mic_s_time();
           
     n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
                 0, (struct sockaddr *) &servaddr, 
                 &len); 
-    t = ms_time() - t;
+    t = mic_s_time() - t;
     printf("Server : "); 
     for (int i=0; i<MAS_SIZE; i++)
         printf("%d ", buffer[i]);
     printf("\n");   
-    printf ("It took %ld milliseconds.\n",t);
+    printf ("It took %ld microseconds.\n",t);
   
     close(sockfd); 
     free(buffer);
