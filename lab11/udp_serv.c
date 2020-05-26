@@ -1,13 +1,12 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <unistd.h> 
-#include <string.h> 
+#include <string.h>
+#include <malloc.h>
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
-  
-#define MAS_SIZE 10
 
 static int comp(const void *a, const void *b)
 {
@@ -16,6 +15,8 @@ static int comp(const void *a, const void *b)
   
 // Driver code 
 int main(int argv, char *argc[]) { 
+    int MAS_SIZE;
+
     if (argv != 2)
     {
         perror("No port given");
@@ -31,7 +32,7 @@ int main(int argv, char *argc[]) {
     }
     
     int sockfd; 
-    int buffer[MAS_SIZE]; 
+    int *buffer; 
     struct sockaddr_in servaddr, cliaddr; 
       
     // Creating socket file descriptor 
@@ -66,7 +67,16 @@ int main(int argv, char *argc[]) {
     int len, n; 
   
     len = sizeof(cliaddr);  //len is value/resuslt 
-  
+    recvfrom(sockfd, (int *)&MAS_SIZE, sizeof(MAS_SIZE),  
+                0, (struct sockaddr *) &cliaddr, 
+                &len);
+
+    sendto(sockfd, (int *)&MAS_SIZE, sizeof(MAS_SIZE),  
+        0, (const struct sockaddr *) &cliaddr, 
+            len); 
+
+    buffer = calloc(MAS_SIZE, sizeof(int));
+
     n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
                 0, (struct sockaddr *) &cliaddr, 
                 &len); 
@@ -77,6 +87,7 @@ int main(int argv, char *argc[]) {
         0, (const struct sockaddr *) &cliaddr, 
             len); 
 
+    free(buffer);
     printf("Server off\n");
     return 0; 
 } 

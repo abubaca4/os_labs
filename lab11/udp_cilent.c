@@ -1,5 +1,6 @@
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <malloc.h>
 #include <sys/time.h>
 #include <unistd.h> 
 #include <string.h> 
@@ -7,10 +8,6 @@
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
-  
-#define MAS_SIZE 10
-#define MIN_R 0
-#define MAX_R 1000
 
 int get_random_number(int min, int max)
 {
@@ -26,7 +23,9 @@ long ms_time()
 }
   
 // Driver code 
-int main(int argv, char *argc[]) { 
+int main(int argv, char *argc[]) 
+{ 
+    int MAS_SIZE = 10, MIN_R = 0, MAX_R = 1000;
     if (argv != 2)
     {
         perror("No address given");
@@ -41,13 +40,21 @@ int main(int argv, char *argc[]) {
         return -1;
     }
 
+    //Set of for make
+    /*printf("Enter count of elements: ");
+    scanf("%d", MAS_SIZE);
+    printf("Enter minimum value: ");
+    scanf("%d", MIN_R);
+    printf("maximum value: ");
+    scanf("%d", MIN_R);*/
+
     char ip[border + 1];
     strncpy(ip, argc[1], border);
     ip[border] = '\0';
     int port = atoi(argc[1] + border + 1);
 
     int sockfd; 
-    int buffer[MAS_SIZE];  
+    int *buffer;  
     struct sockaddr_in     servaddr; 
   
     // Creating socket file descriptor 
@@ -65,6 +72,24 @@ int main(int argv, char *argc[]) {
       
     int n, len; 
     long t;
+
+    sendto(sockfd, (int *)&MAS_SIZE, sizeof(MAS_SIZE), 
+        0, (const struct sockaddr *) &servaddr,  
+            sizeof(servaddr));
+
+    int temp;
+
+    recvfrom(sockfd, (int *)&temp, sizeof(temp),  
+                0, (struct sockaddr *) &servaddr, 
+                &len); 
+
+    if (temp != MAS_SIZE)
+    {
+        perror("Size sending error");
+        return -1;
+    }
+    
+    buffer = calloc(MAS_SIZE, sizeof(int));
     srand(time(NULL));
     for (int i=0; i<MAS_SIZE; i++)
         buffer[i] = get_random_number(MIN_R, MAX_R);
@@ -85,5 +110,6 @@ int main(int argv, char *argc[]) {
     printf ("It took %ld milliseconds.\n",t);
   
     close(sockfd); 
+    free(buffer);
     return 0; 
 } 
