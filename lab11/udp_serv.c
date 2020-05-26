@@ -7,7 +7,7 @@
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
   
-#define MAS_SIZE 10 
+#define MAS_SIZE 10
 
 static int comp(const void *a, const void *b)
 {

@@ -9,9 +9,9 @@ int get_random_number(int min, int max)
     return rand() % (max - min + 1) + min;
 }
 
-int comp(const int *a, const int *b)
+int comp(const void *a, const void *b)
 {
-    return *a > *b;
+    return *(const int *)a > *(const int *)b;
 }
 
 void swap(int *a, int *b)
