@@ -9,9 +9,9 @@
   
 #define MAS_SIZE 10 
 
-int comp(const int *a, const int *b)
+static int comp(const void *a, const void *b)
 {
-    return *a - *b;
+    return *(const int *)a - *(const int *)b;
 }
   
 // Driver code 
@@ -59,7 +59,8 @@ int main(int argv, char *argc[]) {
         }
     } 
 
-    getsockname(sockfd, (struct sockaddr *)&servaddr, sizeof(&servaddr));
+    socklen_t servlen = sizeof(servaddr);
+    getsockname(sockfd, (struct sockaddr *)&servaddr, &servlen);
     printf("Lisening on port: %d\n", ntohs(servaddr.sin_port));
       
     int len, n; 
@@ -67,13 +68,13 @@ int main(int argv, char *argc[]) {
     len = sizeof(cliaddr);  //len is value/resuslt 
   
     n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
-                MSG_WAITALL, (struct sockaddr *) &cliaddr, 
+                0, (struct sockaddr *) &cliaddr, 
                 &len); 
     
     qsort(buffer, MAS_SIZE, sizeof(buffer[0]), comp);
 
     sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
-        MSG_CONFIRM, (const struct sockaddr *) &cliaddr, 
+        0, (const struct sockaddr *) &cliaddr, 
             len); 
 
     printf("Server off\n");

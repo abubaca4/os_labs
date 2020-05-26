@@ -1,9 +1,9 @@
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <sys/time.h>
 #include <unistd.h> 
 #include <string.h> 
 #include <sys/types.h> 
-#include <sys/time.h>
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
 #include <netinet/in.h> 
@@ -17,7 +17,7 @@ int get_random_number(int min, int max)
     return rand() % (max - min + 1) + min;
 }
 
-long mtime()
+long ms_time()
 {
   struct timeval t;
   gettimeofday(&t, NULL);
@@ -61,7 +61,7 @@ int main(int argv, char *argc[]) {
     // Filling server information 
     servaddr.sin_family = AF_INET; 
     servaddr.sin_port = htons(port); 
-    inet_aton(ip, &servaddr.sin_addr.s_addr);
+    inet_aton(ip, &(servaddr.sin_addr));
       
     int n, len; 
     long t;
@@ -70,14 +70,14 @@ int main(int argv, char *argc[]) {
         buffer[i] = get_random_number(MIN_R, MAX_R);
       
     sendto(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE, 
-        MSG_CONFIRM, (const struct sockaddr *) &servaddr,  
+        0, (const struct sockaddr *) &servaddr,  
             sizeof(servaddr)); 
-    t = mtime();
+    t = ms_time();
           
     n = recvfrom(sockfd, (int *)buffer, sizeof(buffer[0]) * MAS_SIZE,  
-                MSG_WAITALL, (struct sockaddr *) &servaddr, 
+                0, (struct sockaddr *) &servaddr, 
                 &len); 
-    t = mtime() - t;
+    t = ms_time() - t;
     printf("Server : "); 
     for (int i=0; i<MAS_SIZE; i++)
         printf("%d ", buffer[i]);
