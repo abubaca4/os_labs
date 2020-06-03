@@ -16,7 +16,7 @@
 
 int main(int argv, char *argc[])
 {
-    /*if (argv != 2)
+    if (argv != 2)
     {
         perror("No address given");
         return -1;
@@ -33,9 +33,7 @@ int main(int argv, char *argc[])
     char ip[border + 1];
     strncpy(ip, argc[1], border);
     ip[border] = '\0';
-    int port = atoi(argc[1] + border + 1);*/
-    char ip[] = "127.0.0.1";
-    int port = 8080;
+    int port = atoi(argc[1] + border + 1);
 
     char path_to_save[] = "downloads";
 
