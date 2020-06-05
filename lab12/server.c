@@ -48,7 +48,7 @@ void command(int fork_pid)
     }
 }
 
-void client(struct sockaddr_in cliaddr, int sockfd)
+void client(int sockfd)
 {
     while (1)
     {
@@ -108,7 +108,7 @@ void lisener(int port)
         socklen_t clilen = sizeof(cliaddr);
         int newsockfd = accept(sockfd, (struct sockaddr *)&cliaddr, &clilen);
         if (fork() == 0)
-            client(cliaddr, newsockfd);
+            client(newsockfd);
     }
 }
 
